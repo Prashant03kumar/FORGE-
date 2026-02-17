@@ -1,0 +1,42 @@
+===========================================================
+FORGE API - ROUTE ARCHITECTURE (v1)
+===========================================================
+
+1. HEALTH CHECK (Public)
+-----------------------------------------------------------
+GET    /api/v1/health            -> Check server & DB status
+
+2. AUTHENTICATION (Public)
+-----------------------------------------------------------
+POST   /api/v1/users/register    -> Create account (Multer for Avatar)
+POST   /api/v1/users/login       -> Get Access & Refresh tokens
+POST   /api/v1/users/refresh     -> Get new Access Token using Refresh Token
+POST   /api/v1/users/logout      -> Clear cookies/tokens (Auth Required)
+
+3. USER PROFILE (Auth Required)
+-----------------------------------------------------------
+GET    /api/v1/users/me          -> Get current user profile
+PATCH  /api/v1/users/update      -> Update bio/name
+PATCH  /api/v1/users/avatar      -> Update profile picture (Multer)
+GET    /api/v1/users/u/:username -> View another user's profile
+GET    /api/v1/users/heatmap     -> Get user activityLog data
+
+4. TASKS & CONSISTENCY (Auth Required)
+-----------------------------------------------------------
+POST   /api/v1/tasks/            -> Create a new task
+GET    /api/v1/tasks/            -> Get all tasks for "Today"
+GET    /api/v1/tasks/history     -> Get past tasks (Pagination Required)
+PATCH  /api/v1/tasks/:id/toggle  -> Mark task Complete/Incomplete
+PATCH  /api/v1/tasks/:id/timer   -> Update timeSpent on a task
+DELETE /api/v1/tasks/:id         -> Delete a task
+
+5. SOCIAL / FOLLOW SYSTEM (Auth Required)
+-----------------------------------------------------------
+POST   /api/v1/follow/:id        -> Follow a user
+DELETE /api/v1/follow/:id        -> Unfollow a user
+GET    /api/v1/follow/followers  -> List of people following you (Pagination)
+GET    /api/v1/follow/following  -> List of people you follow (Pagination)
+
+6. SEARCH & DISCOVERY (Public/Auth)
+-----------------------------------------------------------
+GET    /api/v1/search?q=...      -> Search for users by username

@@ -15,6 +15,8 @@ app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -28,12 +30,14 @@ app.use(cookieParser());
 import healthCheckRoutes from "./routes/healthcheck.routes.js";
 import userRouter from "./routes/user.routes.js";
 import followRouter from "./routes/follow.routes.js";
+import taskRouter from "./routes/task.routes.js";
 import { errorHandler } from "./middlewares/error.middlewares.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 
 // Use routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/follow", followRouter);
+app.use("/api/v1/tasks", taskRouter);
 
 // Routes
 app.use("/api/v1/health", healthCheckRoutes);

@@ -40,7 +40,7 @@ app.use("/api/v1/follow", followRouter);
 app.use("/api/v1/tasks", taskRouter);
 
 // Routes
-app.use("/api/v1/health", healthCheckRoutes);
+app.use("/api/v1/healthcheck", healthCheckRoutes);
 
 // 404 Handler - for undefined routes
 app.use((req, res) => {

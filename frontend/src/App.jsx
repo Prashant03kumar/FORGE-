@@ -1,21 +1,31 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import { useAuth } from "./context/AuthContext";
+
+const ProtectedRoute = ({ children }) => {
+  const { token } = useAuth();
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
-  const [message, setMessage] = useState("Loading...");
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/test")
-      .then((res) => setMessage(res.data.message))
-      .catch((err) => setMessage("Connection Failed"));
-  }, []);
-
   return (
-    <div>
-      <h1>Forge Project</h1>
-      <p>Backend Status: {message}</p>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <div className="p-10">Logged in! Welcome to Forge.</div>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
   );
 }
 

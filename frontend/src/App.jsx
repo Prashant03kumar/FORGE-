@@ -2,6 +2,8 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard"; // Import the new page
+import DashboardLayout from "./Layout/DashboardLayout"; // Import the shell
 import { useAuth } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
@@ -15,15 +17,22 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
+      {/* Protected Dashboard Route Group */}
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <div className="p-10">Logged in! Welcome to Forge.</div>
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        {/* This is the main view that shows up inside the layout */}
+        <Route index element={<Dashboard />} />
 
+        {/* You can add /dashboard/tasks etc. here later */}
+      </Route>
+
+      {/* Default Redirect */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
   );

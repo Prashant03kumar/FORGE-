@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
+import Profile from "./pages/Profile";
 import DashboardLayout from "./Layout/DashboardLayout";
 import { useAuth } from "./context/AuthContext";
 
@@ -32,6 +33,8 @@ function App() {
 
         {/* History Page */}
         <Route path="history" element={<History />} />
+        {/* Profile Page */}
+        <Route path="profile" element={<Profile />} />
       </Route>
 
       {/* Default Redirect */}

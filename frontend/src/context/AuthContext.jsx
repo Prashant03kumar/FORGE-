@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       const response = await API.get("/users/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       const userData = response.data.data;
       setUser({
         _id: userData._id,

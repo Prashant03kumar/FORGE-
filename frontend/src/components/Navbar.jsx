@@ -1,14 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Search, User, Bell, LogOut } from "lucide-react";
 import forgeLogo from "../assets/forge-logo.jpg";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const navigate = useNavigate();
+  const profileMenuRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    if (showProfileMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showProfileMenu]);
 
   const handleLogout = async () => {
     await logout();
+    setShowProfileMenu(false);
+  };
+
+  const goProfile = () => {
+    setShowProfileMenu(false);
+    navigate("/dashboard/profile");
   };
 
   // Default avatar if user has no avatar
@@ -55,49 +82,49 @@ const Navbar = () => {
         </button>
 
         {user ? (
-          <div className="relative">
-            <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100 hover:opacity-80 transition-opacity"
-            >
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-gray-800 leading-none">
-                  {user.username || "User"}
-                </p>
-                <p className="text-[10px] text-gray-400 font-medium">User</p>
-              </div>
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt="Profile"
-                  className="w-9 h-9 rounded-xl object-cover shadow-md"
-                />
-              ) : (
-                <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#ffae75] to-[#FAD5A5] flex items-center justify-center text-white shadow-md">
-                  <User size={18} />
-                </div>
-              )}
-            </button>
-
-            {/* Profile Dropdown Menu */}
-            {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-2 z-50">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-bold text-gray-800">
+          <>
+            <div className="relative" ref={profileMenuRef}>
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100 hover:opacity-80 transition-opacity"
+              >
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm font-bold text-gray-800 leading-none">
                     {user.username || "User"}
                   </p>
-                  <p className="text-[10px] text-gray-400">User</p>
+                  <p className="text-[10px] text-gray-400 font-medium">User</p>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Profile"
+                    className="w-9 h-9 rounded-xl object-cover shadow-md"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#ffae75] to-[#FAD5A5] flex items-center justify-center text-white shadow-md">
+                    <User size={18} />
+                  </div>
+                )}
+              </button>
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-2 z-50">
+                  <button
+                    onClick={goProfile}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors text-sm font-medium"
+                  >
+                    Profile
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <div className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100">
             <p className="text-sm text-gray-600">Login</p>

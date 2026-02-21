@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -7,12 +7,17 @@ import Footer from "../components/Footer";
 const DashboardLayout = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  const location = useLocation();
+  const isProfileRoute = location.pathname.startsWith("/dashboard/profile");
+
   return (
     <div className="flex min-h-screen bg-[#FDF2E9]">
       {/* Desktop Sidebar (hidden on small screens) */}
-      <div className="hidden md:block">
-        <Sidebar />
-      </div>
+      {!isProfileRoute && (
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
+      )}
 
       {/* Mobile: floating toggle to open sidebar (hidden while open) */}
       {!mobileSidebarOpen && (
@@ -51,8 +56,8 @@ const DashboardLayout = () => {
             <Outlet />
           </div>
 
-          {/* Bottom Footer */}
-          <Footer />
+          {/* Bottom Footer (hidden on profile page) */}
+          {!isProfileRoute && <Footer />}
         </main>
       </div>
     </div>

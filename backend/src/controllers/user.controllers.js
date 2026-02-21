@@ -140,7 +140,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         refreshToken: undefined,
       },
     },
-    { new: true }
+    { returnDocument: "after" }
   );
   const options = {
     httpOnly: true,

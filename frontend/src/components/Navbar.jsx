@@ -1,8 +1,19 @@
-import React from "react";
-import { Search, User, Bell } from "lucide-react";
-import forgeLogo from "../assets/forge-logo.jpg"; // Adjust path as needed
+import React, { useState } from "react";
+import { Search, User, Bell, LogOut } from "lucide-react";
+import forgeLogo from "../assets/forge-logo.jpg";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  // Default avatar if user has no avatar
+  const avatarUrl = user?.avatar || null;
+
   return (
     <header className="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center px-4 sm:px-6 justify-between sticky top-0 z-50">
       {/* Left: Logo */}
@@ -43,17 +54,58 @@ const Navbar = () => {
           <Search size={20} />
         </button>
 
-        <div className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-gray-800 leading-none">
-              User Name
-            </p>
-            <p className="text-[10px] text-gray-400 font-medium">Pro Member</p>
+        {user ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100 hover:opacity-80 transition-opacity"
+            >
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-gray-800 leading-none">
+                  {user.username || "User"}
+                </p>
+                <p className="text-[10px] text-gray-400 font-medium">User</p>
+              </div>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile"
+                  className="w-9 h-9 rounded-xl object-cover shadow-md"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#ffae75] to-[#FAD5A5] flex items-center justify-center text-white shadow-md">
+                  <User size={18} />
+                </div>
+              )}
+            </button>
+
+            {/* Profile Dropdown Menu */}
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-2 z-50">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-bold text-gray-800">
+                    {user.username || "User"}
+                  </p>
+                  <p className="text-[10px] text-gray-400">User</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
-          <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#ffae75] to-[#FAD5A5] flex items-center justify-center text-white shadow-md cursor-pointer hover:scale-105 transition-transform">
-            <User size={18} />
+        ) : (
+          <div className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100">
+            <p className="text-sm text-gray-600">Login</p>
+            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-[#ffae75] to-[#FAD5A5] flex items-center justify-center text-white shadow-md">
+              <User size={18} />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

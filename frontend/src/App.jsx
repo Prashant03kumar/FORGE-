@@ -2,8 +2,9 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard"; // Import the new page
-import DashboardLayout from "./Layout/DashboardLayout"; // Import the shell
+import Dashboard from "./pages/Dashboard";
+import History from "./pages/History";
+import DashboardLayout from "./Layout/DashboardLayout";
 import { useAuth } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
@@ -26,10 +27,11 @@ function App() {
           </ProtectedRoute>
         }
       >
-        {/* This is the main view that shows up inside the layout */}
+        {/* Main Dashboard */}
         <Route index element={<Dashboard />} />
 
-        {/* You can add /dashboard/tasks etc. here later */}
+        {/* History Page */}
+        <Route path="history" element={<History />} />
       </Route>
 
       {/* Default Redirect */}

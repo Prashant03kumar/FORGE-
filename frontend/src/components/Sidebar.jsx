@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const Sidebar = () => {
+const Sidebar = ({ mobile = false, onClose = () => {} }) => {
   const { logout } = useAuth();
 
   // Top Item
@@ -45,7 +45,28 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-white h-screen border-r border-gray-100 flex flex-col p-6 sticky top-0">
+    <div
+      className={`bg-white h-screen border-r border-gray-100 flex flex-col p-6 ${
+        mobile
+          ? "h-full shadow-md rounded-r-xl overflow-auto"
+          : "w-64 sticky top-0"
+      }`}
+    >
+      {mobile && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <p className="text-lg font-black text-[#FF6B00]">FORGE</p>
+          </div>
+
+          <button
+            onClick={onClose}
+            aria-label="Close sidebar"
+            className="bg-gray-100 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center"
+          >
+            &lt;
+          </button>
+        </div>
+      )}
       {/* 1. Dashboard (Top) */}
       <div className="mb-8">
         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-4">

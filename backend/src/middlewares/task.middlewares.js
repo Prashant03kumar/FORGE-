@@ -3,10 +3,27 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const validateTaskBody = (req, res, next) => {
-  const { title } = req.body;
-  if (!title || String(title).trim() === "") {
-    throw new ApiError(400, "Title is required");
+  const { title, status } = req.body;
+
+  if (req.method === "POST") {
+    // title is mandatory when creating a task
+    if (!title || String(title).trim() === "") {
+      throw new ApiError(400, "Title is required");
+    }
+  } else if (req.method === "PATCH") {
+    // for updates, only validate values when they are provided
+    if (title !== undefined && String(title).trim() === "") {
+      throw new ApiError(400, "Title cannot be empty");
+    }
+
+    if (
+      status !== undefined &&
+      !["active", "in-progress", "forged"].includes(status)
+    ) {
+      throw new ApiError(400, "Invalid task status");
+    }
   }
+
   next();
 };
 
@@ -23,6 +40,14 @@ export const validateTimerBody = (req, res, next) => {
   const { timeSpent, add } = req.body;
   if (typeof add !== "number" && typeof timeSpent !== "number") {
     throw new ApiError(400, "Provide numeric 'timeSpent' or 'add' field");
+  }
+  next();
+};
+
+export const validateMonthParam = (req, res, next) => {
+  const { month } = req.params;
+  if (!/^[0-9]{4}-[0-9]{2}$/.test(month)) {
+    throw new ApiError(400, "Month must be in YYYY-MM format");
   }
   next();
 };

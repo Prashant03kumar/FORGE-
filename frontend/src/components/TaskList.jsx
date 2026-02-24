@@ -12,7 +12,11 @@ import {
 import AddTaskModal from "./AddTaskModal";
 import { useTasks } from "../context/TaskContext";
 
-const TaskList = () => {
+// `displayTasks` is optional; when provided the list will be used
+// instead of the raw `tasks` array from context. This allows parent
+// components (Dashboard) to supply the filtered subset for the current
+// session, preventing old entries from bleeding through.
+const TaskList = ({ displayTasks }) => {
   const { tasks, addTask, startTask, forgeTask, deleteTask } = useTasks();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showUndo, setShowUndo] = useState(null);
@@ -27,7 +31,11 @@ const TaskList = () => {
     return 2; // forged
   };
 
-  const activeTasks = [...tasks].sort((a, b) => {
+  // determine which list of tasks to render; fall back to the
+  // full context list when nothing is provided by props
+  const tasksToRender = displayTasks || tasks;
+
+  const activeTasks = [...tasksToRender].sort((a, b) => {
     const pa = statusPriority(a.status);
     const pb = statusPriority(b.status);
     if (pa !== pb) return pa - pb;
@@ -41,8 +49,12 @@ const TaskList = () => {
     return b.id - a.id;
   });
 
-  const handleStartTask = (id) => {
-    startTask(id);
+  const handleStartTask = async (id) => {
+    try {
+      await startTask(id);
+    } catch (err) {
+      console.error("start failed", err);
+    }
   };
 
   const handleToggle = (task) => {
@@ -227,7 +239,13 @@ const TaskList = () => {
                         <Edit3 size={18} />
                       </button>
                       <button
-                        onClick={() => deleteTask(task.id)}
+                        onClick={async () => {
+                          try {
+                            await deleteTask(task.id);
+                          } catch (err) {
+                            console.error("delete failed", err);
+                          }
+                        }}
                         className="p-2 text-red-400 hover:bg-red-50 rounded-xl"
                       >
                         <Trash2 size={18} />

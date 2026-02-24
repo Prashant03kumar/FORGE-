@@ -15,6 +15,9 @@ const UserSchema = new Schema(
     currentStreak: { type: Number, default: 0 },
     maxStreak: { type: Number, default: 0 },
 
+    // cumulative sparks (for quick access)
+    totalSpark: { type: Number, default: 0 },
+
     // Heatmap: Array of strings "YYYY-MM-DD"
     activityLog: [{ type: String }],
 

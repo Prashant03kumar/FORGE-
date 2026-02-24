@@ -28,6 +28,8 @@ GET    /api/v1/tasks/            -> Get all tasks for "Today"
 GET    /api/v1/tasks/history     -> Get past tasks (Pagination Required)
 PATCH  /api/v1/tasks/:id/toggle  -> Mark task Complete/Incomplete
 PATCH  /api/v1/tasks/:id/timer   -> Update timeSpent on a task
+GET    /api/v1/tasks/stats       -> Get aggregated user stats (streak/spark/peak)
+GET    /api/v1/tasks/calendar/:month -> Retrieve per-day data for a given month
 DELETE /api/v1/tasks/:id         -> Delete a task
 
 5. SOCIAL / FOLLOW SYSTEM (Auth Required)

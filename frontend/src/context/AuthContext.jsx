@@ -8,10 +8,12 @@ const API = axios.create({
   baseURL: "http://localhost:5000/api/v1",
 });
 
-// Add token to every request
+// add token to every request
+// config is the request configuration object.It contains everything about the request before it is sent.
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
+    // we are modifying headers before request goes out. then the request is sent to server with token attached to it
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

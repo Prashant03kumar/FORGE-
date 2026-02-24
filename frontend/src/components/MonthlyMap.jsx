@@ -1,12 +1,58 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTasks } from "../context/TaskContext";
 
 const MonthlyMap = () => {
-  const daysInMonth = 28;
-  const completedDays = [
-    1, 3, 5, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-  ];
+  const { fetchCalendarMonth } = useTasks();
   const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
+
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth()); // zero-based
+  const [dayMap, setDayMap] = useState({});
+
+  const loadMonth = async (y, m) => {
+    const key = `${y}-${String(m + 1).padStart(2, "0")}`;
+    try {
+      const data = await fetchCalendarMonth(key);
+      const map = {};
+      data.forEach((r) => {
+        const d = new Date(r._id);
+        map[d.getDate()] = {
+          count: r.count,
+          totalHours: r.totalHours,
+        };
+      });
+      setDayMap(map);
+    } catch (err) {
+      console.error("failed to load calendar data", err);
+      setDayMap({});
+    }
+  };
+
+  const { tasks } = useTasks();
+
+  useEffect(() => {
+    if (fetchCalendarMonth) {
+      loadMonth(year, month);
+    }
+  }, [year, month, fetchCalendarMonth, tasks]);
+
+  const prev = () => {
+    const d = new Date(year, month - 1, 1);
+    setYear(d.getFullYear());
+    setMonth(d.getMonth());
+  };
+  const next = () => {
+    const d = new Date(year, month + 1, 1);
+    setYear(d.getFullYear());
+    setMonth(d.getMonth());
+  };
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const monthLabel = new Date(year, month, 1).toLocaleString(undefined, {
+    month: "short",
+  });
 
   return (
     <div className="bg-[#fffaf5] border border-orange-100/50 p-5 rounded-3xl shadow-sm h-full flex flex-col">
@@ -17,14 +63,20 @@ const MonthlyMap = () => {
             Monthly Progress
           </h3>
           <span className="text-[9px] bg-white px-2 py-0.5 rounded border border-orange-100 text-orange-400 font-bold">
-            FEB 2026
+            {monthLabel.toUpperCase()} {year}
           </span>
         </div>
         <div className="flex gap-1">
-          <button className="p-1 hover:bg-orange-50 rounded-md transition-colors">
+          <button
+            onClick={prev}
+            className="p-1 hover:bg-orange-50 rounded-md transition-colors"
+          >
             <ChevronLeft size={16} className="text-gray-400" />
           </button>
-          <button className="p-1 hover:bg-orange-50 rounded-md transition-colors">
+          <button
+            onClick={next}
+            className="p-1 hover:bg-orange-50 rounded-md transition-colors"
+          >
             <ChevronRight size={16} className="text-gray-400" />
           </button>
         </div>
@@ -46,14 +98,16 @@ const MonthlyMap = () => {
       <div className="flex-1 grid grid-cols-7 gap-y-3 gap-x-1 items-center content-start">
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const dayNum = i + 1;
-          const isDone = completedDays.includes(dayNum);
+          const info = dayMap[dayNum] || { count: 0, totalHours: 0 };
+          const thresholdHours = 3; // only mark days with at least this many hours
+          const isDone = info.totalHours >= thresholdHours;
 
           return (
             <div key={i} className="flex flex-col items-center justify-center">
               {isDone ? (
                 <div className="w-8 h-8 sm:w-9 sm:h-9 border-2 border-[#FF6B00] rounded-full flex items-center justify-center bg-white shadow-sm transition-transform hover:scale-110">
                   <span className="text-[#FF6B00] font-black text-[10px] sm:text-xs">
-                    C
+                    {Math.ceil(info.totalHours)}
                   </span>
                 </div>
               ) : (
@@ -61,9 +115,6 @@ const MonthlyMap = () => {
                   <span className="text-[11px] font-bold text-gray-300">
                     {dayNum}
                   </span>
-                  {dayNum < 15 && !isDone && (
-                    <div className="w-1 h-1 bg-red-400 rounded-full mt-0.5" />
-                  )}
                 </div>
               )}
             </div>
@@ -76,7 +127,14 @@ const MonthlyMap = () => {
         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
           Consistency Rate
         </p>
-        <p className="text-xs font-black text-[#FF6B00]">68%</p>
+        <p className="text-xs font-black text-[#FF6B00]">
+          {Math.round(
+            (Object.values(dayMap).filter((d) => d.totalHours >= 3).length /
+              daysInMonth) *
+              100,
+          )}
+          %
+        </p>
       </div>
     </div>
   );

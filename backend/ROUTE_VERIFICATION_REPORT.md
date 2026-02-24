@@ -12,6 +12,20 @@
 
 ### 2. User Routes
 
+### 3. Task Routes
+
+| HTTP Method | Route                    | Controller         | Auth Required | Status |
+| ----------- | ------------------------ | ------------------ | ------------- | ------ |
+| POST        | `/tasks`                 | `createTask`       | ✅ Yes        | ✅ OK  |
+| GET         | `/tasks`                 | `getTodayTasks`    | ✅ Yes        | ✅ OK  |
+| GET         | `/tasks/history`         | `getTaskHistory`   | ✅ Yes        | ✅ OK  |
+| GET         | `/tasks/stats`           | `getStats`         | ✅ Yes        | ✅ OK  |
+| GET         | `/tasks/calendar/:month` | `getCalendarMonth` | ✅ Yes        | ✅ OK  |
+| PATCH       | `/tasks/:id/start`       | `startTask`        | ✅ Yes        | ✅ OK  |
+| PATCH       | `/tasks/:id/forge`       | `forgeTask`        | ✅ Yes        | ✅ OK  |
+| PATCH       | `/tasks/:id`             | `updateTask`       | ✅ Yes        | ✅ OK  |
+| DELETE      | `/tasks/:id`             | `deleteTask`       | ✅ Yes        | ✅ OK  |
+
 **Base Path:** `/api/v1/users`
 
 | HTTP Method | Route              | Controller              | Auth Required | Status |

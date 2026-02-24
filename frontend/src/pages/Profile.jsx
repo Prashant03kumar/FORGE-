@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTasks } from "../context/TaskContext";
 
@@ -6,14 +6,32 @@ const daysKey = (d) => d.toISOString().slice(0, 10);
 
 const colorForCount = (n) => {
   if (!n || n === 0) return "#F3F4F6";
-  if (n <= 2) return "#FFE8D6";
-  if (n <= 4) return "#FFB37B";
-  return "#FF6B00";
+  if (n <= 3) return "#FFE8D6"; // light bronze for 1-3 sparks
+  if (n <= 5) return "#FFB37B"; // darker for 4-5 sparks
+  return "#FF6B00"; // master color 6+
 };
 
 const Profile = () => {
   const { user } = useAuth();
-  const { tasks } = useTasks();
+  const { tasks, fetchStats } = useTasks();
+  const [serverStats, setServerStats] = useState(null);
+
+  useEffect(() => {
+    if (fetchStats) {
+      fetchStats()
+        .then(setServerStats)
+        .catch((err) => console.error("Failed to load stats", err));
+    }
+  }, [fetchStats]);
+
+  // re-fetch stats whenever the local task list changes (e.g. user forges a task)
+  useEffect(() => {
+    if (fetchStats) {
+      fetchStats()
+        .then(setServerStats)
+        .catch((e) => console.error(e));
+    }
+  }, [fetchStats, tasks]);
 
   const forged = useMemo(
     () => tasks.filter((t) => t.status === "forged" && t.forgedAt),
@@ -85,6 +103,7 @@ const Profile = () => {
     return map;
   }, [forged, startDate, endDate]);
 
+  // client-side calculations (fallback)
   const totalSpark = Object.values(dayCounts).reduce((s, v) => s + v, 0);
   const totalActiveDays = Object.keys(dayCounts).length;
   const maxStreak = useMemo(() => {
@@ -118,8 +137,18 @@ const Profile = () => {
 
   const peek = useMemo(() => {
     const vals = Object.values(perDayHours);
-    return vals.length ? Math.max(...vals).toFixed(1) : 0;
+    return vals.length ? Number(Math.max(...vals).toFixed(1)) : 0;
   }, [perDayHours]);
+
+  // override with server stats when available
+  const displayTotalSpark = serverStats ? serverStats.totalSpark : totalSpark;
+  const displayMaxStreak = serverStats ? serverStats.maxStreak : maxStreak;
+  let displayDailyPeak = serverStats
+    ? Number(serverStats.dailyPeak.toFixed(1))
+    : peek;
+
+  // always ensure numeric with one decimal
+  displayDailyPeak = Number(displayDailyPeak.toFixed(1));
 
   const monthsData = useMemo(() => {
     const arr = [];
@@ -192,13 +221,13 @@ const Profile = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { label: "Active Days", val: totalActiveDays },
-              { label: "Max Streak", val: maxStreak },
+              { label: "Max Streak", val: displayMaxStreak },
               {
                 label: "Consistency",
                 val: `${consistencyPct}%`,
                 color: "text-[#FF6B00]",
               },
-              { label: "Daily Peak", val: `${peek}h` },
+              { label: "Daily Peak", val: `${displayDailyPeak.toFixed(1)}h` },
             ].map((stat, i) => (
               <div
                 key={i}
@@ -225,7 +254,7 @@ const Profile = () => {
                 </h3>
                 <p className="text-[10px] text-gray-400 font-bold uppercase">
                   Total Spark:{" "}
-                  <span className="text-[#FF6B00]">{totalSpark}</span>
+                  <span className="text-[#FF6B00]">{displayTotalSpark}</span>
                 </p>
               </div>
               <select
@@ -274,12 +303,19 @@ const Profile = () => {
                   Forge
                 </div>
                 <div className="flex gap-1 items-center">
-                  <div className="w-2.5 h-2.5 rounded-sm bg-[#FF6B00]" /> 5+
+                  <div className="w-2.5 h-2.5 rounded-sm bg-[#FFE8D6]" /> 1–3
+                </div>
+                <div className="flex gap-1 items-center">
+                  <div className="w-2.5 h-2.5 rounded-sm bg-[#FFB37B]" /> 4–5
+                </div>
+                <div className="flex gap-1 items-center">
+                  <div className="w-2.5 h-2.5 rounded-sm bg-[#FF6B00]" /> 6+
                   Master
                 </div>
               </div>
               <div className="text-[10px] font-black text-gray-400 uppercase bg-gray-50 px-3 py-1 rounded-full">
-                Peak Record: <span className="text-gray-800">{peek} HRS</span>
+                Peak Record:{" "}
+                <span className="text-gray-800">{displayDailyPeak} HRS</span>
               </div>
             </div>
           </div>

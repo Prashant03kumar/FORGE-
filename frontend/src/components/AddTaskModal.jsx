@@ -39,7 +39,7 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
     setMinute(num.toString().padStart(2, "0"));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!task.title) return;
 
@@ -47,8 +47,13 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
     const finalHour = hour || "12";
     const finalMin = minute || "00";
 
-    onAdd({ ...task, reminder: `${finalHour}:${finalMin} ${period}` });
-    onClose();
+    try {
+      await onAdd({ ...task, reminder: `${finalHour}:${finalMin} ${period}` });
+      onClose();
+    } catch (err) {
+      console.error("error creating task", err);
+      // could show a toast here
+    }
   };
 
   return (

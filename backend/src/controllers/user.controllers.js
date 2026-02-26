@@ -55,12 +55,15 @@ const registerUser = asyncHandler(async (req, res) => {
   }
   // Create user
   try {
+    const now = new Date();
     const newUser = await User.create({
       fullName,
       email,
       username: username.toLowerCase(),
       password,
       avatar: avatarUrl?.url || "",
+      registeredAt: now,
+      registrationYear: now.getFullYear(),
     });
 
     const createdUser = await User.findById(newUser._id).select(

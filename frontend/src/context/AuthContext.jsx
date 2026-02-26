@@ -46,7 +46,12 @@ export const AuthProvider = ({ children }) => {
         username: userData.username,
         email: userData.email,
         avatar: userData.avatar || null,
-        role: "User", // Default role; update from backend if available
+        role: userData.role || "User",
+        // expose registration info for heatmap logic
+        registrationYear:
+          userData.registrationYear ||
+          (userData.createdAt && new Date(userData.createdAt).getFullYear()),
+        createdAt: userData.createdAt,
       });
     } catch (error) {
       console.error("Failed to fetch current user:", error);

@@ -39,54 +39,47 @@ const Profile = () => {
   );
 
   // ... (Keep all your existing calculation logic here)
-  const yearsMap = useMemo(() => {
-    const map = {};
-    forged.forEach((t) => {
-      try {
-        const d = new Date(t.forgedAt);
-        const y = d.getFullYear();
-        const m = d.getMonth();
-        map[y] = map[y] || new Set();
-        map[y].add(m);
-      } catch (e) {}
-    });
-    return map;
-  }, [forged]);
+  // determine the first year to show based on when the user signed up
+  const registrationYear = useMemo(() => {
+    if (!user) return new Date().getFullYear();
+    return (
+      user.registrationYear ||
+      (user.createdAt && new Date(user.createdAt).getFullYear()) ||
+      new Date().getFullYear()
+    );
+  }, [user]);
 
   const yearOptions = useMemo(() => {
-    const opts = ["Current"];
-    const years = Object.keys(yearsMap)
-      .map((s) => parseInt(s))
-      .sort((a, b) => b - a);
-    years.forEach((y) => {
-      const months = Array.from(yearsMap[y]).sort((a, b) => a - b);
-      const max = months[months.length - 1];
-      const endMonth = new Date(y, max, 1).toLocaleString(undefined, {
-        month: "short",
-      });
-      opts.push(`${y} (Jan - ${endMonth})`);
-    });
+    const opts = [];
+    const cur = new Date().getFullYear();
+    for (let y = registrationYear; y <= cur; y++) {
+      opts.push(y.toString());
+    }
     return opts;
-  }, [yearsMap]);
+  }, [registrationYear]);
 
-  const [selectedRange, setSelectedRange] = useState("Current");
+  const [selectedRange, setSelectedRange] = useState("");
+  useEffect(() => {
+    if (!selectedRange && yearOptions.length) {
+      // default to the most recent year
+      setSelectedRange(yearOptions[yearOptions.length - 1]);
+    }
+  }, [yearOptions, selectedRange]);
 
   const { startDate, endDate } = useMemo(() => {
-    if (selectedRange === "Current") {
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - 365);
-      return { startDate: start, endDate: end };
-    }
-    const yearMatch = selectedRange.match(/^(\d{4})/);
-    if (yearMatch) {
-      const y = parseInt(yearMatch[1]);
+    const y = parseInt(selectedRange, 10);
+    if (!isNaN(y)) {
       return {
         startDate: new Date(y, 0, 1),
         endDate: new Date(y, 11, 31, 23, 59, 59),
       };
     }
-    return { startDate: new Date(), endDate: new Date() };
+    // fallback to current year if something weird happens
+    const cur = new Date().getFullYear();
+    return {
+      startDate: new Date(cur, 0, 1),
+      endDate: new Date(cur, 11, 31, 23, 59, 59),
+    };
   }, [selectedRange]);
 
   const dayCounts = useMemo(() => {

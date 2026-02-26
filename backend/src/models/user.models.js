@@ -11,6 +11,17 @@ const UserSchema = new Schema(
     avatar: { type: String, default: "" },
     refreshToken: { type: String }, // For secure long-term sessions
 
+    // Fields added to help with heatmap/year options
+    // when a user signs up we capture the year they registered and the
+    // exact date.  This allows the front‑end to start the heatmap from
+    // the registration year instead of always showing “Current” or
+    // trying to infer from activity.
+    registeredAt: { type: Date, default: Date.now },
+    registrationYear: {
+      type: Number,
+      default: () => new Date().getFullYear(), // year of signup
+    },
+
     // Consistency Tracking
     currentStreak: { type: Number, default: 0 },
     maxStreak: { type: Number, default: 0 },
@@ -30,6 +41,12 @@ const UserSchema = new Schema(
 //We have schema so before saving the user password we need password encryption
 
 UserSchema.pre("save", async function () {
+  // make sure registrationYear is always present (for legacy docs)
+  if (!this.registrationYear) {
+    const base = this.registeredAt || this.createdAt || new Date();
+    this.registrationYear = new Date(base).getFullYear();
+  }
+
   if (!this.isModified("password")) return; // Only hash if password is new or changed
   try {
     const salt = await bcrypt.genSalt(10);

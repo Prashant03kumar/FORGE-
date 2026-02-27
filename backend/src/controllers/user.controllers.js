@@ -231,21 +231,29 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "Current user details"));
 });
 
-// 7. Update user profile -
+// 7. Update user profile - supports fullName, email, and bio
 const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName, email } = req.body;
+  const { fullName, email, bio } = req.body;
 
   if (!fullName || !email) {
     throw new ApiError(400, "Fullname and email are required");
   }
 
+  // Build update object with all provided fields
+  const updateData = {
+    fullName,
+    email: email.toLowerCase(),
+  };
+
+  // Include bio if provided
+  if (bio !== undefined) {
+    updateData.bio = bio;
+  }
+
   const updatedUser = await User.findByIdAndUpdate(
     req.user?._id,
     {
-      $set: {
-        fullName,
-        email: email.toLowerCase(),
-      },
+      $set: updateData,
     },
     { new: true }
   ).select("-password -refreshToken");

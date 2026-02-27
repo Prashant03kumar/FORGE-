@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import api from "../api/axios";
-import forgeLogo from "../assets/forge-logo.jpg";
+// logo stored in public folder
+const forgeLogo = "/forge-logo.png";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 

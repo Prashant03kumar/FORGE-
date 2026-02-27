@@ -183,12 +183,21 @@ const Profile = () => {
         {/* SIDEBAR: Shrink-0 ensures it doesn't compress or push the layout */}
         <div className="w-full md:w-1/4 lg:w-75 shrink-0">
           <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm flex flex-col items-center md:items-start text-center md:text-left">
-            <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-[#ffae75] to-[#FF6B00] flex items-center justify-center text-white font-black text-2xl shadow-lg mb-4">
-              {(user?.username || "U").charAt(0).toUpperCase()}
-            </div>
+            {/* Profile Avatar - shows uploaded image or placeholder */}
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt="Profile"
+                className="w-20 h-20 rounded-2xl object-cover shadow-lg mb-4 border border-orange-400/30"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-[#ffae75] to-[#FF6B00] flex items-center justify-center text-white font-black text-2xl shadow-lg mb-4">
+                {(user?.username || "U").charAt(0).toUpperCase()}
+              </div>
+            )}
             <div className="mb-4">
               <h2 className="text-xl font-black text-gray-800">
-                {user?.username || "User"}
+                {user?.fullName || user?.username || "User"}
               </h2>
               <p className="text-xs text-gray-400 font-bold uppercase">
                 @{(user?.username || "user").toLowerCase()}

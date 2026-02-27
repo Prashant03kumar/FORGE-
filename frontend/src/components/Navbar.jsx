@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Search, User, Bell, LogOut } from "lucide-react";
-import forgeLogo from "../assets/forge-logo.jpg";
+// logo lives in the public folder, so we reference it by URL instead of importing
+// import forgeLogo from "../assets/forge-logo.jpg";
+const forgeLogo = "/forge-logo.png";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -38,22 +40,27 @@ const Navbar = () => {
     navigate("/dashboard/profile");
   };
 
+  const goDashboard = () => {
+    navigate("/dashboard");
+  };
+
   // Default avatar if user has no avatar
   const avatarUrl = user?.avatar || null;
 
   return (
     <header className="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center px-4 sm:px-6 justify-between sticky top-0 z-50">
-      {/* Left: Logo */}
-      <div className="flex items-center gap-3">
+      {/* Left: Logo - clickable to go to dashboard */}
+      <button
+        onClick={goDashboard}
+        className="flex items-center gap-3 hover:opacity-75 transition-opacity"
+        title="Go to Dashboard"
+      >
         <img
           src={forgeLogo}
           alt="Forge Logo"
-          className="w-10 h-10 object-contain rounded-lg"
+          className="w-20 h-20 object-contain rounded-lg cursor-pointer"
         />
-        <span className="text-xl font-black text-[#FF6B00] tracking-tighter hidden sm:block">
-          FORGE
-        </span>
-      </div>
+      </button>
 
       {/* Center: Search Bar (hidden on small screens) */}
       <div className="hidden sm:flex flex-1 max-w-md mx-6">
@@ -90,7 +97,7 @@ const Navbar = () => {
               >
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-bold text-gray-800 leading-none">
-                    {user.username || "User"}
+                    {user.fullName.split(" ")[0] || "User"}
                   </p>
                   <p className="text-[10px] text-gray-400 font-medium">User</p>
                 </div>

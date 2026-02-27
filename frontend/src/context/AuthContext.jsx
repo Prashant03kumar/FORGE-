@@ -45,6 +45,8 @@ export const AuthProvider = ({ children }) => {
         _id: userData._id,
         username: userData.username,
         email: userData.email,
+        fullName: userData.fullName || "",
+        bio: userData.bio || "",
         avatar: userData.avatar || null,
         role: userData.role || "User",
         // expose registration info for heatmap logic
@@ -92,7 +94,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, setUser, token, login, logout, loading }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );

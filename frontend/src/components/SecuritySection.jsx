@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Lock, ShieldCheck, Loader2 } from "lucide-react"; // Optional: for icons
+import { Lock, ShieldCheck, Loader2 } from "lucide-react";
+import api from "../api/axios";
 
 const SecuritySection = () => {
   const [passwords, setPasswords] = useState({
@@ -26,18 +27,21 @@ const SecuritySection = () => {
     }
 
     try {
-      // Logic for backend:
-      // await axios.post("/api/v1/users/change-password", passwords);
-
-      console.log("Password Change Requested", passwords);
+      // Call backend API to change password
+      const res = await api.post("/users/change-password", {
+        oldPassword: passwords.oldPassword,
+        newPassword: passwords.newPassword,
+      });
 
       // Success feedback
-      setMessage({ type: "success", text: "Password forged successfully!" });
+      setMessage({ type: "success", text: "Password changed successfully!" });
       setPasswords({ oldPassword: "", newPassword: "" });
     } catch (err) {
+      const errorMsg =
+        err.response?.data?.message || "Failed to update password. Try again.";
       setMessage({
         type: "error",
-        text: "Failed to update password. Try again.",
+        text: errorMsg,
       });
     } finally {
       setLoading(false);

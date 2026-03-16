@@ -1,46 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { Flame, Timer, CheckCircle2 } from "lucide-react";
+import { Flame, CheckCircle2 } from "lucide-react";
+import { useTasks } from "../context/TaskContext";
+import { getEffectiveDate } from "../utils/dateUtils";
 
 const DailyChallenge = () => {
-  const [goal, setGoal] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
+  const { getTodaysForgedHours, getTodaysForged, getSessionTasks } = useTasks();
+  const [goal, setGoal] = useState(5);
 
+  // Generate a stable daily goal (3–5 hrs) that persists across re-renders
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getEffectiveDate();
     const savedData = JSON.parse(localStorage.getItem("dailyForge")) || {};
 
-    // If it's a new day, generate a new random goal (3-5)
     if (savedData.date !== today) {
-      const randomGoal = Math.floor(Math.random() * 3) + 3; // Generates 3, 4, or 5
-      const newData = { date: today, goal: randomGoal, progress: 0 };
-      localStorage.setItem("dailyForge", JSON.stringify(newData));
+      const randomGoal = Math.floor(Math.random() * 3) + 3; // 3, 4, or 5
+      localStorage.setItem(
+        "dailyForge",
+        JSON.stringify({ date: today, goal: randomGoal }),
+      );
       setGoal(randomGoal);
-      setProgress(0);
     } else {
       setGoal(savedData.goal);
-      setProgress(savedData.progress);
-      if (savedData.progress >= savedData.goal) setIsCompleted(true);
     }
   }, []);
 
-  const addHour = () => {
-    if (progress < goal) {
-      const newProgress = progress + 1;
-      setProgress(newProgress);
+  // Derive progress automatically from forged tasks
+  const forgedHours = getTodaysForgedHours();
+  const progress = Math.min(forgedHours, goal); // cap at goal
+  const percentage = goal > 0 ? Math.round((progress / goal) * 100) : 0;
+  const isCompleted = progress >= goal;
 
-      const today = new Date().toISOString().split("T")[0];
-      localStorage.setItem(
-        "dailyForge",
-        JSON.stringify({ date: today, goal, progress: newProgress }),
-      );
-
-      if (newProgress >= goal) {
-        setIsCompleted(true);
-        // Here you would eventually call your backend to update the streak
-      }
-    }
-  };
+  // Extra info
+  const forgedCount = getTodaysForged().length;
+  const totalTasks = getSessionTasks().length;
 
   return (
     <div className="bg-white border border-gray-100 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all h-full flex flex-col justify-between">
@@ -63,7 +55,7 @@ const DailyChallenge = () => {
         <p className="text-gray-500 text-sm mb-8">
           {isCompleted
             ? "You've mastered today's goal. Streak maintained."
-            : `Complete ${goal} hours of deep study to earn your streak.`}
+            : `Complete ${goal} hours of deep work to earn your streak.`}
         </p>
       </div>
 
@@ -72,7 +64,7 @@ const DailyChallenge = () => {
         <div className="relative pt-1">
           <div className="flex mb-2 items-center justify-between">
             <div className="text-xs font-bold text-[#FF6B00]">
-              {Math.round((progress / goal) * 100)}% Complete
+              {percentage}% Complete
             </div>
             <div className="text-xs font-bold text-gray-400">
               {progress} / {goal} hrs
@@ -80,7 +72,7 @@ const DailyChallenge = () => {
           </div>
           <div className="overflow-hidden h-3 mb-4 text-xs flex rounded-full bg-gray-100">
             <div
-              style={{ width: `${(progress / goal) * 100}%` }}
+              style={{ width: `${percentage}%` }}
               className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-500 ${
                 isCompleted ? "bg-green-500" : "bg-[#FF6B00]"
               }`}
@@ -88,19 +80,17 @@ const DailyChallenge = () => {
           </div>
         </div>
 
-        {/* Action Button */}
-        {!isCompleted ? (
-          <button
-            onClick={addHour}
-            className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-black transition-all active:scale-95"
-          >
-            <Timer size={20} />
-            Log 1 Hour
-          </button>
-        ) : (
+        {/* Status Section */}
+        {isCompleted ? (
           <div className="w-full py-4 bg-green-50 text-green-600 rounded-2xl font-bold flex items-center justify-center gap-3 border border-green-100">
             <CheckCircle2 size={20} />
             Goal Achieved
+          </div>
+        ) : (
+          <div className="w-full py-3 bg-gray-50 text-gray-500 rounded-2xl text-sm font-medium flex items-center justify-center gap-2 border border-gray-100">
+            <Flame size={16} className="text-[#FF6B00]" />
+            {forgedCount} of {totalTasks} task{totalTasks !== 1 ? "s" : ""}{" "}
+            forged today
           </div>
         )}
       </div>

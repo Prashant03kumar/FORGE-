@@ -12,8 +12,10 @@ const TaskContext = createContext();
 
 export function TaskProvider({ children }) {
   const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentForgeDay, setCurrentForgeDay] = useState(getEffectiveDate());
 
-  // helper to normalize server objects to frontend shape
+  // Helper to normalize server objects
   const normalize = (t) => {
     const { _id, description, ...rest } = t;
     return {
@@ -23,38 +25,82 @@ export function TaskProvider({ children }) {
     };
   };
 
-  // Track the current forge day to force UI updates at 4 AM
-  const [currentForgeDay, setCurrentForgeDay] = useState(getEffectiveDate());
-
-  // 1. Keep LocalStorage synced (still useful as offline cache)
+  // 1. SYNC TO LOCAL STORAGE (Background task)
   useEffect(() => {
-    localStorage.setItem("forge_tasks", JSON.stringify(tasks));
+    if (tasks.length > 0) {
+      localStorage.setItem("forge_tasks", JSON.stringify(tasks));
+    }
   }, [tasks]);
 
-  // 2. AUTO-RESET LOGIC: Check every minute if we've crossed the 4 AM threshold
+  // 2. AUTO-RESET LOGIC (Check every minute for 4 AM)
   useEffect(() => {
     const interval = setInterval(() => {
       const latestDate = getEffectiveDate();
       if (latestDate !== currentForgeDay) {
-        setCurrentForgeDay(latestDate); // This triggers a re-render of the Dashboard
+        setCurrentForgeDay(latestDate);
       }
-    }, 60000); // Check every 60 seconds
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [currentForgeDay]);
 
-  // create on server then update local state
+  // 3. THE "STABLE" LOAD FUNCTION (Prevents Loops)
+  const loadTasks = useCallback(async () => {
+    // Skip fetching if user is not authenticated
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.log("⚔️ No auth token found, skipping task fetch.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      console.log("⚔️ Forging Data: Fetching from server...");
+      const [todayRes, historyRes] = await Promise.all([
+        api.get("/tasks"),
+        api.get("/tasks/history?limit=1000&page=1"),
+      ]);
+
+      const today = (todayRes.data.data || []).map(normalize);
+      const historyTasks = (historyRes.data.data?.tasks || []).map(normalize);
+
+      // Merge and dedupe
+      const merged = [...today];
+      const seen = new Set(merged.map((t) => t.id));
+      historyTasks.forEach((t) => {
+        if (!seen.has(t.id)) {
+          merged.push(t);
+          seen.add(t.id);
+        }
+      });
+
+      setTasks(merged);
+    } catch (err) {
+      console.error("Failed to load tasks:", err);
+      const saved = localStorage.getItem("forge_tasks");
+      if (saved) setTasks(JSON.parse(saved));
+    } finally {
+      setLoading(false);
+    }
+  }, []); // Empty deps = function never changes
+
+  // 4. TRIGGER LOAD ONLY ON MOUNT OR DAY CHANGE
+  useEffect(() => {
+    loadTasks();
+  }, [currentForgeDay, loadTasks]);
+
+  // --- ACTIONS ---
+
   const addTask = async (newTask) => {
     try {
       const body = {
         title: newTask.title,
         description: newTask.desc,
-        // reminder is frontend-only; store if you extend backend
         reminder: newTask.reminder,
       };
       const res = await api.post("/tasks", body);
       const task = normalize(res.data.data);
-      setTasks((prev) => [...prev, task]);
+      setTasks((prev) => [task, ...prev]);
       return task;
     } catch (err) {
       console.error("failed to create task", err);
@@ -96,55 +142,8 @@ export function TaskProvider({ children }) {
     }
   };
 
-  // 4. BACKEND HELPERS (optional)
-  const fetchStats = async () => {
-    const res = await api.get("/tasks/stats");
-    return res.data.data;
-  };
+  // --- HELPERS ---
 
-  const fetchCalendarMonth = async (month) => {
-    const res = await api.get(`/tasks/calendar/${month}`);
-    return res.data.data;
-  };
-
-  // 2. LOAD LOGIC: fetch today's tasks whenever the forge day changes
-  const loadTasks = useCallback(async () => {
-    try {
-      // load today's tasks and recent history concurrently
-      const [todayRes, historyRes] = await Promise.all([
-        api.get("/tasks"),
-        api.get("/tasks/history?limit=1000&page=1"),
-      ]);
-      const today = (todayRes.data.data || []).map(normalize);
-      const historyTasks =
-        (historyRes.data.data?.tasks || []).map(normalize) || [];
-
-      // merge and dedupe by id (today's may overlap with history if same)
-      const merged = [...today];
-      const seen = new Set(merged.map((t) => t.id));
-      historyTasks.forEach((t) => {
-        if (!seen.has(t.id)) {
-          merged.push(t);
-          seen.add(t.id);
-        }
-      });
-
-      setTasks(merged);
-    } catch (err) {
-      console.error("failed to load tasks", err);
-      // fallback to localStorage if available
-      const saved = localStorage.getItem("forge_tasks");
-      if (saved) setTasks(JSON.parse(saved));
-    }
-  }, []);
-
-  useEffect(() => {
-    loadTasks();
-  }, [loadTasks, currentForgeDay]);
-
-  // 3. IMPROVED HELPERS: Using currentForgeDay state to ensure reactivity
-  // Get ALL tasks from the current session/forge-day, regardless of status
-  // (active, in-progress, and forged all together)
   const getSessionTasks = useCallback(() => {
     return tasks.filter((t) => t.sessionDate === currentForgeDay);
   }, [tasks, currentForgeDay]);
@@ -161,21 +160,42 @@ export function TaskProvider({ children }) {
     );
   }, [tasks, currentForgeDay]);
 
+  // Calculate total hours worked today from forged tasks (startedAt → forgedAt)
+  const getTodaysForgedHours = useCallback(() => {
+    const forgedToday = tasks.filter(
+      (t) => t.sessionDate === currentForgeDay && t.status === "forged",
+    );
+
+    let totalMs = 0;
+    forgedToday.forEach((t) => {
+      if (t.startedAt && t.forgedAt) {
+        const started = new Date(t.startedAt).getTime();
+        const forged = new Date(t.forgedAt).getTime();
+        if (forged > started) {
+          totalMs += forged - started;
+        }
+      }
+    });
+
+    // Convert ms to hours, round to 1 decimal
+    return Math.round((totalMs / (1000 * 60 * 60)) * 10) / 10;
+  }, [tasks, currentForgeDay]);
+
   return (
     <TaskContext.Provider
       value={{
-        tasks, // The "Source of Truth" (all history)
-        currentForgeDay, // Current date for UI labels
-        getSessionTasks, // ALL tasks from current session (all statuses)
-        getActiveTasks, // Only non-forged tasks for the current 4AM cycle
-        getTodaysForged, // Only forged tasks for the current 4AM cycle
+        tasks,
+        loading,
+        currentForgeDay,
+        getSessionTasks,
+        getActiveTasks,
+        getTodaysForged,
+        getTodaysForgedHours,
         addTask,
         startTask,
         forgeTask,
         deleteTask,
-        // backend helpers
-        fetchStats,
-        fetchCalendarMonth,
+        loadTasks, // Exposed if you need manual refresh
       }}
     >
       {children}

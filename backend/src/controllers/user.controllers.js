@@ -308,22 +308,26 @@ const getUserProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "User profile fetched"));
 });
 
-// 10. Get users with search
-// GET /api/v1/users/search?query=sachin
+// 10. Get users with search (paginated)
+// GET /api/v1/users/search?query=sachin&page=1&limit=12
 const searchUsers = asyncHandler(async (req, res) => {
   const { query } = req.query;
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);
+  const skip = (page - 1) * limit;
 
   // IF NO QUERY: Show "Suggested Forgers"
   if (!query) {
     const discoveryUsers = await User.aggregate([
-      { $sample: { size: 5 } }, // Get 5 random users
+      { $sample: { size: 5 } },
       {
         $project: {
-          // Only send public data
           username: 1,
           fullName: 1,
           avatar: 1,
           currentStreak: 1,
+          totalSpark: 1,
+          bio: 1,
         },
       },
     ]);
@@ -331,21 +335,30 @@ const searchUsers = asyncHandler(async (req, res) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, discoveryUsers, "Discovery: Suggested Forgers")
+        new ApiResponse(200, { users: discoveryUsers, total: discoveryUsers.length, page: 1, limit: 5 }, "Discovery: Suggested Forgers")
       );
   }
 
-  // IF QUERY EXISTS: Perform Search
-  const users = await User.find({
+  // IF QUERY EXISTS: Perform Search with pagination
+  const filter = {
     $or: [
       { username: { $regex: query, $options: "i" } },
       { fullName: { $regex: query, $options: "i" } },
     ],
-  }).select("username fullName avatar currentStreak");
+  };
+
+  const [total, users] = await Promise.all([
+    User.countDocuments(filter),
+    User.find(filter)
+      .select("username fullName avatar currentStreak totalSpark bio")
+      .skip(skip)
+      .limit(limit)
+      .sort({ totalSpark: -1 }),
+  ]);
 
   return res
     .status(200)
-    .json(new ApiResponse(200, users, "Users found successfully"));
+    .json(new ApiResponse(200, { users, total, page, limit }, "Users found successfully"));
 });
 
 export {

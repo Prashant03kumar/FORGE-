@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import UserProfile from "./pages/UserProfile";
 import DashboardLayout from "./Layout/DashboardLayout";
 import { useAuth } from "./context/AuthContext";
 
@@ -38,6 +39,8 @@ function App() {
         <Route path="profile" element={<Profile />} />
         {/* Settings */}
         <Route path="settings" element={<Settings />} />
+        {/* View other user's profile */}
+        <Route path="user/:username" element={<UserProfile />} />
       </Route>
 
       {/* Default Redirect */}

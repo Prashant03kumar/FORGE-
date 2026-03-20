@@ -136,7 +136,7 @@ const MyAccount = () => {
   }, [user]);
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8 transition-all">
+    <div className="bg-transparent rounded-3xl p-6 sm:p-8 transition-all">
       {/* Header Section: Title and Profile Image */}
       <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center mb-8 gap-4">
         <div>
@@ -201,17 +201,17 @@ const MyAccount = () => {
       <div className="space-y-6">
         {/* Username Display (Read-Only) - user cannot change this */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             Warrior Username (Cannot be changed)
           </label>
-          <div className="w-full bg-gray-900/50 border border-gray-700 rounded-2xl px-4 py-3 text-gray-400 opacity-75">
+          <div className="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-2xl px-4 py-3 text-gray-500 dark:text-gray-400 opacity-75">
             {user?.username || ""}
           </div>
         </div>
 
         {/* Full Name Input - user can edit */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             Full Name
           </label>
           <input
@@ -220,13 +220,13 @@ const MyAccount = () => {
             value={formData.fullName}
             onChange={handleChange}
             placeholder="Enter your full name"
-            className={`w-full bg-gray-900/80 border border-gray-600 rounded-2xl px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all`}
+            className={`w-full bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all`}
           />
         </div>
 
         {/* Bio Textarea - user can edit */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             Warrior Bio
           </label>
           <textarea
@@ -236,16 +236,16 @@ const MyAccount = () => {
             placeholder="Tell us about yourself (max 150 characters)"
             rows="4"
             maxLength="150"
-            className={`w-full bg-gray-900/80 border border-gray-600 rounded-2xl px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all resize-none`}
+            className={`w-full bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all resize-none`}
           />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
             {formData.bio.length}/150 characters
           </p>
         </div>
 
         {/* Email Input - user can edit */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
             Email Address
           </label>
           <input
@@ -254,7 +254,7 @@ const MyAccount = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
-            className={`w-full bg-gray-900/80 border border-gray-600 rounded-2xl px-4 py-3 text-white placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all`}
+            className={`w-full bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all`}
           />
         </div>
 

@@ -56,7 +56,7 @@ const History = () => {
   return (
     <div className="p-8 max-w-5xl mx-auto animate-in fade-in duration-500">
       <header className="mb-6">
-        <h1 className="text-3xl font-black text-gray-800 tracking-tight">
+        <h1 className="text-3xl font-black text-gray-800 dark:text-gray-100 tracking-tight">
           Forge History
         </h1>
         <p className="text-gray-400 font-medium italic">
@@ -74,7 +74,7 @@ const History = () => {
 
           return (
             <section key={key}>
-              <h2 className="text-lg font-black text-gray-700 mb-3">
+              <h2 className="text-lg font-black text-gray-700 dark:text-gray-300 mb-3">
                 {monthName(date)} {year}
               </h2>
 
@@ -89,10 +89,10 @@ const History = () => {
                         <li
                           key={task.id}
                           onClick={() => setSelectedTask(task)}
-                          className="cursor-pointer bg-white p-4 rounded-2xl border border-gray-100 flex items-center hover:shadow-md"
+                          className="cursor-pointer bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors shadow-sm dark:shadow-none"
                         >
                           <div>
-                            <div className="font-bold text-gray-800">
+                            <div className="font-bold text-gray-800 dark:text-gray-100">
                               {task.title}
                             </div>
                           </div>
@@ -102,7 +102,7 @@ const History = () => {
                   </div>
                 ))
               ) : (
-                <div className="py-6 text-center text-gray-400 bg-white rounded-2xl border border-dashed border-gray-100">
+                <div className="py-6 text-center text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-100 dark:border-gray-700">
                   No activity in {monthName(date)}.
                 </div>
               )}
@@ -114,36 +114,36 @@ const History = () => {
       {/* Timeline Modal */}
       {selectedTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white max-w-md w-full rounded-2xl shadow-2xl p-6 relative">
+          <div className="bg-white dark:bg-gray-800 max-w-md w-full rounded-2xl shadow-2xl p-6 relative">
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full"
             >
               <X />
             </button>
 
             <div className="flex items-center gap-4 mb-4">
-              <div className="bg-green-50 p-3 rounded-2xl text-green-600">
+              <div className="bg-green-50 dark:bg-green-500/10 p-3 rounded-2xl text-green-600 dark:text-green-400">
                 <CheckCircle2 size={20} />
               </div>
               <div>
-                <h3 className="text-lg font-black text-gray-800">
+                <h3 className="text-lg font-black text-gray-800 dark:text-gray-100">
                   {selectedTask.title}
                 </h3>
-                <p className="text-xs text-gray-400">{selectedTask.desc}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{selectedTask.desc}</p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <div className="text-[10px] font-black text-gray-400 uppercase">
+              <div className="flex justify-between items-center text-gray-700 dark:text-gray-300">
+                <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase">
                   Planned
                 </div>
                 <div className="font-bold">{selectedTask.reminder || "-"}</div>
               </div>
 
-              <div className="flex justify-between items-center">
-                <div className="text-[10px] font-black text-gray-400 uppercase">
+              <div className="flex justify-between items-center text-gray-700 dark:text-gray-300">
+                <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase">
                   Started
                 </div>
                 <div className="font-bold">
@@ -157,7 +157,7 @@ const History = () => {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center text-gray-700 dark:text-gray-300">
                 <div className="text-[10px] font-black text-[#FF6B00] uppercase">
                   Forged
                 </div>

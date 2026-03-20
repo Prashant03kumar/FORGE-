@@ -11,7 +11,7 @@ const DashboardLayout = () => {
   const isProfileRoute = location.pathname.startsWith("/dashboard/profile");
 
   return (
-    <div className="flex min-h-screen bg-[#FDF2E9]">
+    <div className="flex min-h-screen bg-[#FDF2E9] dark:bg-gray-900 transition-colors duration-300">
       {/* Desktop Sidebar (hidden on small screens) */}
       {!isProfileRoute && (
         <div className="hidden md:block">

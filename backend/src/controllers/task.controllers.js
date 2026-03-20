@@ -259,7 +259,7 @@ const deleteTask = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Not authorized to delete this task");
   }
 
-  await task.remove();
+  await task.deleteOne();
 
   return res
     .status(200)

@@ -31,6 +31,7 @@ import healthCheckRoutes from "./routes/healthcheck.routes.js";
 import userRouter from "./routes/user.routes.js";
 import followRouter from "./routes/follow.routes.js";
 import taskRouter from "./routes/task.routes.js";
+import insightRouter from "./routes/insight.routes.js";
 import { errorHandler } from "./middlewares/error.middlewares.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 
@@ -38,6 +39,7 @@ import { ApiResponse } from "./utils/ApiResponse.js";
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/follow", followRouter);
 app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/insights", insightRouter);
 
 // Routes
 app.use("/api/v1/healthcheck", healthCheckRoutes);

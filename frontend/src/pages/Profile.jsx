@@ -1,18 +1,21 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTasks } from "../context/TaskContext";
+import { useTheme } from "../context/ThemeContext";
 
 const daysKey = (d) => d.toISOString().slice(0, 10);
 
-const colorForCount = (n) => {
-  if (!n || n === 0) return "#F3F4F6";
-  if (n <= 3) return "#FFE8D6"; // light bronze for 1-3 sparks
-  if (n <= 5) return "#FFB37B"; // darker for 4-5 sparks
+const colorForCount = (n, isDark) => {
+  if (!n || n === 0) return isDark ? "#374151" : "#F3F4F6";
+  if (n <= 3) return isDark ? "#7c2d12" : "#FFE8D6"; // light bronze for 1-3 sparks
+  if (n <= 5) return isDark ? "#c2410c" : "#FFB37B"; // darker for 4-5 sparks
   return "#FF6B00"; // master color 6+
 };
 
 const Profile = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const { tasks, fetchStats } = useTasks();
   const [serverStats, setServerStats] = useState(null);
 
@@ -178,11 +181,11 @@ const Profile = () => {
 
   return (
     /* FIXED: The container is now explicitly max-width 100vw and hides any horizontal bleed */
-    <div className="w-full max-w-[90vw] min-h-screen bg-[#FCF9F6] p-4 md:p-8 overflow-x-hidden">
+    <div className="w-full max-w-[90vw] min-h-screen bg-[#FCF9F6] dark:bg-gray-900 p-4 md:p-8 overflow-x-hidden rounded-3xl md:rounded-tl-none">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6">
         {/* SIDEBAR: Shrink-0 ensures it doesn't compress or push the layout */}
         <div className="w-full md:w-1/4 lg:w-75 shrink-0">
-          <div className="bg-white rounded-3xl border border-gray-100 p-6 shadow-sm flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 p-6 shadow-sm flex flex-col items-center md:items-start text-center md:text-left">
             {/* Profile Avatar - shows uploaded image or placeholder */}
             {user?.avatar ? (
               <img
@@ -196,21 +199,21 @@ const Profile = () => {
               </div>
             )}
             <div className="mb-4">
-              <h2 className="text-xl font-black text-gray-800">
+              <h2 className="text-xl font-black text-gray-800 dark:text-gray-100">
                 {user?.fullName || user?.username || "User"}
               </h2>
-              <p className="text-xs text-gray-400 font-bold uppercase">
+              <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase">
                 @{(user?.username || "user").toLowerCase()}
               </p>
             </div>
-            <div className="bg-orange-50 text-[#FF6B00] px-3 py-1 rounded-full text-[10px] font-black uppercase mb-6">
+            <div className="bg-orange-50 dark:bg-orange-500/10 text-[#FF6B00] px-3 py-1 rounded-full text-[10px] font-black uppercase mb-6">
               {user?.role || "Member"}
             </div>
-            <div className="w-full border-t border-gray-50 pt-4">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
+            <div className="w-full border-t border-gray-50 dark:border-gray-700 pt-4">
+              <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">
                 About
               </p>
-              <p className="text-sm text-gray-600 italic leading-relaxed line-clamp-3">
+              <p className="text-sm text-gray-600 dark:text-gray-300 italic leading-relaxed line-clamp-3">
                 {user?.bio || "No bio provided."}
               </p>
             </div>
@@ -233,13 +236,13 @@ const Profile = () => {
             ].map((stat, i) => (
               <div
                 key={i}
-                className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm"
+                className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 shadow-sm"
               >
-                <p className="text-[10px] text-gray-400 uppercase font-black tracking-wider mb-1">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-wider mb-1">
                   {stat.label}
                 </p>
                 <p
-                  className={`text-xl font-black ${stat.color || "text-gray-800"}`}
+                  className={`text-xl font-black ${stat.color || "text-gray-800 dark:text-gray-100"}`}
                 >
                   {stat.val}
                 </p>
@@ -248,13 +251,13 @@ const Profile = () => {
           </div>
 
           {/* ACTIVITY HEATMAP: The true fix for horizontal stretching */}
-          <div className="bg-white border border-gray-100 rounded-4xl p-5 md:p-8 shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-4xl p-5 md:p-8 shadow-sm overflow-hidden">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
               <div>
-                <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight">
+                <h3 className="text-sm font-black text-gray-800 dark:text-gray-100 uppercase tracking-tight">
                   Activity Heatmap
                 </h3>
-                <p className="text-[10px] text-gray-400 font-bold uppercase">
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase">
                   Total Spark:{" "}
                   <span className="text-[#FF6B00]">{displayTotalSpark}</span>
                 </p>
@@ -262,7 +265,7 @@ const Profile = () => {
               <select
                 value={selectedRange}
                 onChange={(e) => setSelectedRange(e.target.value)}
-                className="w-full sm:w-auto bg-gray-50 border-none rounded-xl px-3 py-2 text-xs font-black text-gray-500 uppercase outline-none"
+                className="w-full sm:w-auto bg-gray-50 dark:bg-gray-700 border-none rounded-xl px-3 py-2 text-xs font-black text-gray-500 dark:text-gray-300 uppercase outline-none"
               >
                 {yearOptions.map((o) => (
                   <option key={o} value={o}>
@@ -280,7 +283,7 @@ const Profile = () => {
               <div className="flex gap-6 min-w-max px-1">
                 {monthsData.map((m) => (
                   <div key={`${m.year}-${m.month}`} className="shrink-0">
-                    <p className="text-[10px] text-gray-400 font-black mb-3 uppercase text-center border-b border-gray-50 pb-1">
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black mb-3 uppercase text-center border-b border-gray-50 dark:border-gray-700 pb-1">
                       {m.label}
                     </p>
                     <div className="grid grid-cols-7 gap-1.5">
@@ -288,7 +291,7 @@ const Profile = () => {
                         <div
                           key={d.date}
                           className="w-3.5 h-3.5 sm:w-3.5 sm:h-3.5 rounded-[3px] shadow-sm transition-transform active:scale-125"
-                          style={{ background: colorForCount(d.count) }}
+                          style={{ background: colorForCount(d.count, isDark) }}
                         />
                       ))}
                     </div>
@@ -298,26 +301,26 @@ const Profile = () => {
             </div>
 
             {/* Legend */}
-            <div className="mt-4 pt-4 border-t border-gray-50 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex gap-4 text-[9px] font-black text-gray-300 uppercase tracking-widest">
+            <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-700 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex gap-4 text-[9px] font-black text-gray-300 dark:text-gray-500 uppercase tracking-widest">
                 <div className="flex gap-1 items-center">
-                  <div className="w-2.5 h-2.5 rounded-sm bg-[#F3F4F6]" /> 0
+                  <div className={`w-2.5 h-2.5 rounded-sm bg-[${isDark ? "#374151" : "#F3F4F6"}]`} /> 0
                   Forge
                 </div>
                 <div className="flex gap-1 items-center">
-                  <div className="w-2.5 h-2.5 rounded-sm bg-[#FFE8D6]" /> 1–3
+                  <div className={`w-2.5 h-2.5 rounded-sm bg-[${isDark ? "#7c2d12" : "#FFE8D6"}]`} /> 1–3
                 </div>
                 <div className="flex gap-1 items-center">
-                  <div className="w-2.5 h-2.5 rounded-sm bg-[#FFB37B]" /> 4–5
+                  <div className={`w-2.5 h-2.5 rounded-sm bg-[${isDark ? "#c2410c" : "#FFB37B"}]`} /> 4–5
                 </div>
                 <div className="flex gap-1 items-center">
                   <div className="w-2.5 h-2.5 rounded-sm bg-[#FF6B00]" /> 6+
                   Master
                 </div>
               </div>
-              <div className="text-[10px] font-black text-gray-400 uppercase bg-gray-50 px-3 py-1 rounded-full">
+              <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase bg-gray-50 dark:bg-gray-700 px-3 py-1 rounded-full">
                 Peak Record:{" "}
-                <span className="text-gray-800">{displayDailyPeak} HRS</span>
+                <span className="text-gray-800 dark:text-gray-100">{displayDailyPeak} HRS</span>
               </div>
             </div>
           </div>

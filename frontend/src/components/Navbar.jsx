@@ -221,7 +221,7 @@ const Navbar = () => {
     if (!showSearchDropdown) return null;
 
     return (
-      <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[100] max-h-[70vh] overflow-hidden flex flex-col">
+      <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-[100] max-h-[70vh] overflow-hidden flex flex-col">
         {/* Recent Searches (shown when no query typed) */}
         {!searchQuery.trim() && recentSearches.length > 0 && (
           <div className="p-4">
@@ -283,21 +283,21 @@ const Navbar = () => {
           <>
             {searchResults.length === 0 ? (
               <div className="p-8 text-center">
-                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-50 flex items-center justify-center">
-                  <User size={24} className="text-gray-300" />
+                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-50 dark:bg-gray-700/50 flex items-center justify-center">
+                  <User size={24} className="text-gray-300 dark:text-gray-500" />
                 </div>
-                <p className="text-sm font-bold text-gray-600 mb-1">
+                <p className="text-sm font-bold text-gray-600 dark:text-gray-300 mb-1">
                   No users found
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-400 dark:text-gray-500">
                   Try a different search term
                 </p>
               </div>
             ) : (
               <>
                 {/* Results header */}
-                <div className="px-4 pt-3 pb-2 border-b border-gray-50">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="px-4 pt-3 pb-2 border-b border-gray-50 dark:border-gray-700">
+                  <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     {searchTotal} user{searchTotal !== 1 ? "s" : ""} found
                   </p>
                 </div>
@@ -308,13 +308,13 @@ const Navbar = () => {
                     <button
                       key={u._id}
                       onClick={() => handleUserClick(u.username)}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-orange-50 transition-all text-left group"
+                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-orange-50 dark:hover:bg-gray-700/50 transition-all text-left group"
                     >
                       {u.avatar ? (
                         <img
                           src={u.avatar}
                           alt={u.fullName}
-                          className="w-10 h-10 rounded-xl object-cover shadow-sm border border-gray-100 group-hover:border-orange-200 transition-colors shrink-0"
+                          className="w-10 h-10 rounded-xl object-cover shadow-sm border border-gray-100 dark:border-gray-700 group-hover:border-orange-200 transition-colors shrink-0"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#ffae75] to-[#FAD5A5] flex items-center justify-center text-white font-bold shadow-sm shrink-0">
@@ -322,7 +322,7 @@ const Navbar = () => {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-gray-800 truncate group-hover:text-[#FF6B00] transition-colors">
+                        <p className="text-sm font-bold text-gray-800 dark:text-gray-100 truncate group-hover:text-[#FF6B00] transition-colors">
                           {u.fullName || u.username}
                         </p>
                         <p className="text-xs text-gray-400 truncate">
@@ -396,7 +396,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center px-4 sm:px-6 justify-between sticky top-0 z-50">
+      <header className="h-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 flex items-center px-4 sm:px-6 justify-between sticky top-0 z-50 transition-colors">
         {/* Left: Logo */}
         <button
           onClick={goDashboard}
@@ -425,7 +425,7 @@ const Navbar = () => {
               onFocus={handleSearchFocus}
               onKeyDown={handleSearchKeyDown}
               placeholder="Search users..."
-              className="w-full bg-gray-50 border border-gray-100 py-2.5 pl-12 pr-10 rounded-2xl outline-none focus:bg-white focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-all text-sm"
+              className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 py-2.5 pl-12 pr-10 rounded-2xl text-gray-900 dark:text-gray-100 outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-all text-sm"
             />
             {searchQuery && (
               <button
@@ -465,10 +465,10 @@ const Navbar = () => {
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100 hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-3 pl-2 sm:pl-4 sm:border-l sm:border-gray-100 dark:sm:border-gray-700 hover:opacity-80 transition-opacity"
                 >
                   <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold text-gray-800 leading-none">
+                    <p className="text-sm font-bold text-gray-800 dark:text-gray-100 leading-none">
                       {user.fullName.split(" ")[0] || "User"}
                     </p>
                     <p className="text-[10px] text-gray-400 font-medium">
@@ -488,16 +488,16 @@ const Navbar = () => {
                   )}
                 </button>
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 py-2 z-50">
                     <button
                       onClick={goProfile}
-                      className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors text-sm font-medium"
+                      className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors text-sm font-medium"
                     >
                       Profile
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm font-medium"
                     >
                       <LogOut size={16} />
                       Logout
@@ -519,9 +519,9 @@ const Navbar = () => {
 
       {/* Mobile Search Overlay */}
       {showMobileSearch && (
-        <div className="fixed inset-0 z-[200] bg-white flex flex-col">
+        <div className="fixed inset-0 z-[200] bg-white dark:bg-gray-900 flex flex-col">
           {/* Mobile search header */}
-          <div className="flex items-center gap-3 p-4 border-b border-gray-100">
+          <div className="flex items-center gap-3 p-4 border-b border-gray-100 dark:border-gray-800">
             <button
               onClick={() => {
                 setShowMobileSearch(false);
@@ -547,7 +547,7 @@ const Navbar = () => {
                 onKeyDown={handleSearchKeyDown}
                 placeholder="Search users..."
                 autoFocus
-                className="w-full bg-gray-50 border border-gray-100 py-2.5 pl-10 pr-10 rounded-xl outline-none focus:bg-white focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-all text-sm"
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 py-2.5 pl-10 pr-10 rounded-xl text-gray-900 dark:text-gray-100 outline-none focus:bg-white dark:focus:bg-gray-900 focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-all text-sm"
               />
               {searchQuery && (
                 <button

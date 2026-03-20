@@ -55,29 +55,29 @@ const MonthlyMap = () => {
   });
 
   return (
-    <div className="bg-[#fffaf5] border border-orange-100/50 p-5 rounded-3xl shadow-sm h-full flex flex-col">
+    <div className="bg-[#fffaf5] dark:bg-gray-800 border border-orange-100/50 dark:border-gray-700 p-5 rounded-3xl shadow-sm h-full flex flex-col">
       {/* Header - Made more compact */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
-          <h3 className="text-gray-800 font-bold text-base">
+          <h3 className="text-gray-800 dark:text-gray-100 font-bold text-base">
             Monthly Progress
           </h3>
-          <span className="text-[9px] bg-white px-2 py-0.5 rounded border border-orange-100 text-orange-400 font-bold">
+          <span className="text-[9px] bg-white dark:bg-gray-700 px-2 py-0.5 rounded border border-orange-100 dark:border-gray-600 text-orange-400 font-bold">
             {monthLabel.toUpperCase()} {year}
           </span>
         </div>
         <div className="flex gap-1">
           <button
             onClick={prev}
-            className="p-1 hover:bg-orange-50 rounded-md transition-colors"
+            className="p-1 hover:bg-orange-50 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
-            <ChevronLeft size={16} className="text-gray-400" />
+            <ChevronLeft size={16} className="text-gray-400 dark:text-gray-500" />
           </button>
           <button
             onClick={next}
-            className="p-1 hover:bg-orange-50 rounded-md transition-colors"
+            className="p-1 hover:bg-orange-50 dark:hover:bg-gray-700 rounded-md transition-colors"
           >
-            <ChevronRight size={16} className="text-gray-400" />
+            <ChevronRight size={16} className="text-gray-400 dark:text-gray-500" />
           </button>
         </div>
       </div>
@@ -105,14 +105,14 @@ const MonthlyMap = () => {
           return (
             <div key={i} className="flex flex-col items-center justify-center">
               {isDone ? (
-                <div className="w-8 h-8 sm:w-9 sm:h-9 border-2 border-[#FF6B00] rounded-full flex items-center justify-center bg-white shadow-sm transition-transform hover:scale-110">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 border-2 border-[#FF6B00] rounded-full flex items-center justify-center bg-white dark:bg-gray-900 shadow-sm transition-transform hover:scale-110">
                   <span className="text-[#FF6B00] font-black text-[10px] sm:text-xs">
                     {Math.ceil(info.totalHours)}
                   </span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center h-8 sm:h-9 justify-center">
-                  <span className="text-[11px] font-bold text-gray-300">
+                  <span className="text-[11px] font-bold text-gray-300 dark:text-gray-600">
                     {dayNum}
                   </span>
                 </div>
@@ -123,7 +123,7 @@ const MonthlyMap = () => {
       </div>
 
       {/* Footer - Tightened margin */}
-      <div className="mt-4 pt-3 border-t border-orange-100/50 flex justify-between items-center">
+      <div className="mt-4 pt-3 border-t border-orange-100/50 dark:border-gray-700 flex justify-between items-center">
         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
           Consistency Rate
         </p>

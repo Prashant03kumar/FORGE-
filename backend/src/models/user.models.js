@@ -34,6 +34,13 @@ const UserSchema = new Schema(
 
     // Bio for profile
     bio: { type: String, maxLength: 150 },
+
+    // The Forge Oracle insight
+    weeklyInsight: {
+      content: { type: String },
+      generatedAt: { type: Date },
+      rawStats: { type: Object }
+    },
   },
   { timestamps: true }
 );

@@ -49,13 +49,13 @@ const SecuritySection = () => {
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8">
+    <div className="bg-transparent rounded-3xl p-6 sm:p-8">
       <div className="mb-8">
-        <h2 className="text-2xl font-black text-white uppercase tracking-tight flex items-center gap-2">
+        <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 uppercase tracking-tight flex items-center gap-2">
           <ShieldCheck className="text-orange-500" />
           Security Vault
         </h2>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           Update your access credentials below.
         </p>
       </div>
@@ -63,7 +63,7 @@ const SecuritySection = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Old Password */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
             Current Password
           </label>
           <div className="relative">
@@ -73,14 +73,14 @@ const SecuritySection = () => {
               value={passwords.oldPassword}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-white transition-all outline-none focus:border-orange-500/50"
+              className="w-full bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all"
             />
           </div>
         </div>
 
         {/* New Password */}
         <div className="space-y-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+          <label className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
             New Password
           </label>
           <div className="relative">
@@ -90,7 +90,7 @@ const SecuritySection = () => {
               value={passwords.newPassword}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-white transition-all outline-none focus:border-orange-500/50"
+              className="w-full bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 transition-all"
             />
           </div>
         </div>

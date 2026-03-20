@@ -89,7 +89,7 @@ const TaskList = ({ displayTasks }) => {
   }, [showUndo, countdown, forgeTask]);
 
   return (
-    <div className="relative bg-white rounded-3xl shadow-sm border border-orange-100/50 overflow-hidden">
+    <div className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-orange-100/50 dark:border-gray-700 overflow-hidden">
       {/* ALERTS */}
       {showAlertTask && (
         <div className="fixed top-12 left-1/2 -translate-x-1/2 z-100 bg-gray-900 text-white px-8 py-5 rounded-3xl shadow-2xl flex items-center gap-4 border border-white/10 animate-in slide-in-from-top">
@@ -131,12 +131,12 @@ const TaskList = ({ displayTasks }) => {
       )}
 
       {/* Header */}
-      <div className="p-8 flex justify-between items-center border-b border-gray-50">
+      <div className="p-8 flex justify-between items-center border-b border-gray-50 dark:border-gray-700">
         <div>
-          <h2 className="text-2xl font-black text-gray-800 tracking-tight">
+          <h2 className="text-2xl font-black text-gray-800 dark:text-gray-100 tracking-tight">
             Today's Tasks
           </h2>
-          <p className="text-gray-400 text-xs italic font-medium">
+          <p className="text-gray-400 dark:text-gray-500 text-xs italic font-medium">
             Start the grind. Forge the result.
           </p>
         </div>
@@ -150,20 +150,20 @@ const TaskList = ({ displayTasks }) => {
 
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50/50">
-            <tr className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">
+          <thead className="bg-gray-50/50 dark:bg-gray-800/50">
+            <tr className="text-[10px] uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 font-black">
               <th className="p-6 w-24 text-center">Status</th>
               <th className="p-6">Task Details</th>
               <th className="p-6 hidden md:table-cell">Timeline</th>
               <th className="p-6 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {activeTasks.map((task) => (
               <tr
                 key={task.id}
-                className="hover:bg-orange-50/30 transition-colors"
-              >
+                className="hover:bg-orange-50/30 dark:hover:bg-gray-700/50 transition-colors"
+               >
                 <td className="p-6 text-center">
                   {task.status === "active" ? (
                     <button
@@ -178,8 +178,8 @@ const TaskList = ({ displayTasks }) => {
                       onClick={() => handleToggle(task)}
                       className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center cursor-pointer mx-auto ${
                         task.id === showUndo
-                          ? "border-orange-400 animate-pulse bg-orange-50"
-                          : "border-gray-200"
+                          ? "border-orange-400 animate-pulse bg-orange-50 dark:bg-orange-500/10"
+                          : "border-gray-200 dark:border-gray-600"
                       }`}
                       title="Running"
                     >
@@ -191,7 +191,7 @@ const TaskList = ({ displayTasks }) => {
                     // forged
                     <div
                       onClick={() => handleToggle(task)}
-                      className="w-8 h-8 rounded-xl border-2 border-gray-200 flex items-center justify-center cursor-pointer mx-auto bg-white text-[#FF6B00]"
+                      className="w-8 h-8 rounded-xl border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center cursor-pointer mx-auto bg-white dark:bg-gray-900 text-[#FF6B00]"
                       title="Forged"
                     >
                       <Check size={16} />
@@ -202,11 +202,11 @@ const TaskList = ({ displayTasks }) => {
                 <td className="p-6">
                   <div className="flex flex-col">
                     <span
-                      className={`text-lg font-bold ${task.status === "forged" ? "line-through text-gray-400" : "text-gray-700"}`}
+                      className={`text-lg font-bold ${task.status === "forged" ? "line-through text-gray-400 dark:text-gray-500" : "text-gray-700 dark:text-gray-200"}`}
                     >
                       {task.title}
                     </span>
-                    <span className="text-xs text-gray-400 italic">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 italic">
                       {task.desc}
                     </span>
                   </div>
@@ -235,7 +235,7 @@ const TaskList = ({ displayTasks }) => {
                 <td className="p-6 text-right">
                   {task.status !== "forged" ? (
                     <div className="flex justify-end gap-1">
-                      <button className="p-2 text-blue-400 hover:bg-blue-50 rounded-xl">
+                      <button className="p-2 text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl">
                         <Edit3 size={18} />
                       </button>
                       <button
@@ -246,13 +246,13 @@ const TaskList = ({ displayTasks }) => {
                             console.error("delete failed", err);
                           }
                         }}
-                        className="p-2 text-red-400 hover:bg-red-50 rounded-xl"
+                        className="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl"
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[10px] font-black text-green-600 bg-green-50 px-4 py-2 rounded-full border border-green-100 uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-4 py-2 rounded-full border border-green-100 dark:border-green-800/30 uppercase tracking-widest">
                       Forged
                     </span>
                   )}

@@ -2,13 +2,12 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
-  CheckSquare,
   History,
-  Calendar,
   Settings,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import ForgeOracle from "./ForgeOracle";
 
 const Sidebar = ({ mobile = false, onClose = () => {} }) => {
   const { logout } = useAuth();
@@ -23,19 +22,9 @@ const Sidebar = ({ mobile = false, onClose = () => {} }) => {
   // Middle Items
   const middleItems = [
     {
-      name: "My Tasks",
-      path: "/dashboard/tasks",
-      icon: <CheckSquare size={22} />,
-    },
-    {
       name: "History",
       path: "/dashboard/history",
       icon: <History size={22} />,
-    },
-    {
-      name: "Calendar",
-      path: "/dashboard/calendar",
-      icon: <Calendar size={22} />,
     },
     {
       name: "Settings",
@@ -46,7 +35,7 @@ const Sidebar = ({ mobile = false, onClose = () => {} }) => {
 
   return (
     <div
-      className={`bg-white h-screen border-r border-gray-100 flex flex-col p-6 ${
+      className={`bg-white dark:bg-gray-900 h-screen border-r border-gray-100 dark:border-gray-800 flex flex-col p-6 ${
         mobile
           ? "h-full shadow-md rounded-r-xl overflow-auto"
           : "w-64 sticky top-0"
@@ -79,7 +68,7 @@ const Sidebar = ({ mobile = false, onClose = () => {} }) => {
             `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
               isActive
                 ? "bg-[#FF6B00] text-white shadow-lg shadow-[#FF6B00]/20"
-                : "text-gray-500 hover:bg-gray-50 hover:text-[#FF6B00]"
+                : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#FF6B00] dark:hover:text-[#FF6B00]"
             }`
           }
         >
@@ -102,7 +91,7 @@ const Sidebar = ({ mobile = false, onClose = () => {} }) => {
                 `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
                   isActive
                     ? "bg-[#FF6B00]/10 text-[#FF6B00] font-bold"
-                    : "text-gray-500 hover:bg-gray-50 hover:text-[#FF6B00]"
+                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#FF6B00] dark:hover:text-[#FF6B00]"
                 }`
               }
             >
@@ -113,11 +102,15 @@ const Sidebar = ({ mobile = false, onClose = () => {} }) => {
         </nav>
       </div>
 
+      <div className="mt-8">
+        <ForgeOracle />
+      </div>
+
       {/* 3. Logout (Bottom) */}
-      <div className="pt-6 border-t border-gray-100">
+      <div className="pt-6 mt-auto border-t border-gray-100 dark:border-gray-800">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-2xl"
+          className="w-full flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all rounded-2xl"
         >
           <LogOut size={22} />
           <span className="font-bold text-sm">Logout</span>

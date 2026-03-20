@@ -8,9 +8,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import ForgeOracle from "./ForgeOracle";
+import LogoutModal from "./LogoutModal";
 
 const Sidebar = ({ mobile = false, onClose = () => {} }) => {
   const { logout } = useAuth();
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
 
   // Top Item
   const topItem = {
@@ -109,13 +111,19 @@ const Sidebar = ({ mobile = false, onClose = () => {} }) => {
       {/* 3. Logout (Bottom) */}
       <div className="pt-6 mt-auto border-t border-gray-100 dark:border-gray-800">
         <button
-          onClick={logout}
+          onClick={() => setShowLogoutModal(true)}
           className="w-full flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all rounded-2xl"
         >
           <LogOut size={22} />
           <span className="font-bold text-sm">Logout</span>
         </button>
       </div>
+
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={logout} 
+      />
     </div>
   );
 };

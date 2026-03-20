@@ -144,6 +144,16 @@ export function TaskProvider({ children }) {
 
   // --- HELPERS ---
 
+  const fetchCalendarMonth = useCallback(async (monthStr) => {
+    try {
+      const res = await api.get(`/tasks/calendar/${monthStr}`);
+      return res.data.data;
+    } catch (err) {
+      console.error("failed to fetch calendar data", err);
+      return [];
+    }
+  }, []);
+
   const getSessionTasks = useCallback(() => {
     return tasks.filter((t) => t.sessionDate === currentForgeDay);
   }, [tasks, currentForgeDay]);
@@ -196,6 +206,7 @@ export function TaskProvider({ children }) {
         forgeTask,
         deleteTask,
         loadTasks, // Exposed if you need manual refresh
+        fetchCalendarMonth,
       }}
     >
       {children}

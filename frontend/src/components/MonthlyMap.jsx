@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTasks } from "../context/TaskContext";
 
 const MonthlyMap = () => {
-  const { fetchCalendarMonth } = useTasks();
+  const { fetchCalendarMonth, getTodaysForgedHours } = useTasks();
   const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 
   const now = new Date();
@@ -17,8 +17,9 @@ const MonthlyMap = () => {
       const data = await fetchCalendarMonth(key);
       const map = {};
       data.forEach((r) => {
-        const d = new Date(r._id);
-        map[d.getDate()] = {
+        const [yearStr, monthStr, dayStr] = r._id.split("-");
+        const actDay = parseInt(dayStr, 10);
+        map[actDay] = {
           count: r.count,
           totalHours: r.totalHours,
         };
@@ -98,7 +99,14 @@ const MonthlyMap = () => {
       <div className="flex-1 grid grid-cols-7 gap-y-3 gap-x-1 items-center content-start">
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const dayNum = i + 1;
-          const info = dayMap[dayNum] || { count: 0, totalHours: 0 };
+          let info = dayMap[dayNum] || { count: 0, totalHours: 0 };
+          
+          // Override today's hours with the LIVE calculated context hours
+          const isToday = year === now.getFullYear() && month === now.getMonth() && dayNum === now.getDate();
+          if (isToday) {
+            info.totalHours = getTodaysForgedHours();
+          }
+
           const thresholdHours = 3; // only mark days with at least this many hours
           const isDone = info.totalHours >= thresholdHours;
 
@@ -128,11 +136,15 @@ const MonthlyMap = () => {
           Consistency Rate
         </p>
         <p className="text-xs font-black text-[#FF6B00]">
-          {Math.round(
-            (Object.values(dayMap).filter((d) => d.totalHours >= 3).length /
+          {daysInMonth > 0 ? Math.round(
+            (Object.keys(dayMap).map(k => {
+               const kInt = parseInt(k, 10);
+               const isToday = year === now.getFullYear() && month === now.getMonth() && kInt === now.getDate();
+               return isToday ? getTodaysForgedHours() : dayMap[k].totalHours;
+            }).filter(h => h >= 3).length /
               daysInMonth) *
               100,
-          )}
+          ) : 0}
           %
         </p>
       </div>

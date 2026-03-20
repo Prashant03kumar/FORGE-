@@ -15,6 +15,7 @@ const forgeLogo = "/forge-logo.png";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import LogoutModal from "./LogoutModal";
 
 const RECENT_SEARCHES_KEY = "forge_recent_searches";
 const MAX_RECENT = 10;
@@ -45,9 +46,10 @@ const clearRecentSearches = () => {
   localStorage.removeItem(RECENT_SEARCHES_KEY);
 };
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const { user, logout } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
   const profileMenuRef = useRef(null);
 
@@ -203,6 +205,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     await logout();
     setShowProfileMenu(false);
+    setShowLogoutModal(false);
   };
 
   const goProfile = () => {
@@ -496,7 +499,7 @@ const Navbar = () => {
                       Profile
                     </button>
                     <button
-                      onClick={handleLogout}
+                      onClick={() => setShowLogoutModal(true)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm font-medium"
                     >
                       <LogOut size={16} />
@@ -697,6 +700,11 @@ const Navbar = () => {
           </div>
         </div>
       )}
+      <LogoutModal 
+        isOpen={showLogoutModal} 
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout} 
+      />
     </>
   );
 };

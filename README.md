@@ -85,29 +85,4 @@
 
 ---
 
-## 💻 Environment Variables Setup Instruction
-
-Ensure you declare these in your frontend `.env`:
-```env
-VITE_UNSPLASH_ACCESS_KEY=your_key_here
-VITE_API_NINJAS_KEY=your_key_here
-VITE_API_URL=http://localhost:8000/api/v1  
-```
-
-And parallel variables in your backend `.env`:
-```env
-PORT=8000
-MONGODB_URI=your_mongo_url
-CORS_ORIGIN=http://localhost:5173
-ACCESS_TOKEN_SECRET=some_strong_secret
-ACCESS_TOKEN_EXPIRY=1d
-REFRESH_TOKEN_SECRET=some_strong_secret_2
-REFRESH_TOKEN_EXPIRY=10d
-CLOUDINARY_CLOUD_NAME=your_name
-CLOUDINARY_API_KEY=your_key
-CLOUDINARY_API_SECRET=your_secret
-```
-
----
-
 *This complete feature manual & baseline reflects the fully scaled MERN architecture, bringing an end to the previous locally-hosted iterations.*

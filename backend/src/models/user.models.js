@@ -11,6 +11,13 @@ const UserSchema = new Schema(
     avatar: { type: String, default: "" },
     refreshToken: { type: String }, // For secure long-term sessions
 
+    // Email Verification and Reset Password
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    tokenExpiry: { type: Date },
+    resetPasswordToken: { type: String },
+    resetPasswordExpiry: { type: Date },
+
     // Fields added to help with heatmap/year options
     // when a user signs up we capture the year they registered and the
     // exact date.  This allows the front‑end to start the heatmap from

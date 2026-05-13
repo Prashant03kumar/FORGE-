@@ -7,6 +7,8 @@ import {
   uploadOnCloudinary,
   deleteFromCloudinary,
 } from "../utils/cloudinary.js";
+import { sendEmail } from "../utils/mail.js";
+import { generateToken, generateTokenExpiry } from "../utils/token.js";
 
 // Generate access token and refresh token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -41,6 +43,12 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
+  // Strict email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new ApiError(400, "Invalid email format");
+  }
+
   // Check for existing user
   const existingUser = await User.findOne({ $or: [{ email }, { username }] });
   if (existingUser) {
@@ -56,18 +64,38 @@ const registerUser = asyncHandler(async (req, res) => {
   // Create user
   try {
     const now = new Date();
+    const verificationToken = generateToken();
+
     const newUser = await User.create({
       fullName,
-      email,
+      email: email.toLowerCase(),
       username: username.toLowerCase(),
       password,
       avatar: avatarUrl?.url || "",
       registeredAt: now,
       registrationYear: now.getFullYear(),
+      isVerified: false,
+      verificationToken,
+      tokenExpiry: generateTokenExpiry(15), // 15 mins
     });
 
+    // Send Verification Email
+    try {
+      const verifyLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-email?token=${verificationToken}`;
+      const emailHtml = `<p>Hi ${fullName},</p><p>Please verify your email by clicking the link below:</p><a href="${verifyLink}">Verify Email</a>`;
+      
+      await sendEmail(newUser.email, "Verify your email", emailHtml);
+    } catch (emailError) {
+      // Rollback user creation
+      await User.findByIdAndDelete(newUser._id);
+      if (avatarUrl) {
+        await deleteFromCloudinary(avatarUrl.public_id);
+      }
+      throw new ApiError(500, "Invalid or unreachable email. Registration failed.");
+    }
+
     const createdUser = await User.findById(newUser._id).select(
-      "-password -refreshToken"
+      "-password -refreshToken -verificationToken -tokenExpiry"
     );
 
     if (!createdUser) {
@@ -76,13 +104,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
     return res
       .status(201)
-      .json(new ApiResponse(201, createdUser, "User registered successfully"));
+      .json(new ApiResponse(201, createdUser, "User registered successfully. Please check your email to verify."));
   } catch (error) {
     console.error("Error during user registration", error);
-    if (avatarUrl) {
+    if (avatarUrl && !error?.message?.includes("unreachable email")) {
       // If avatar was uploaded but user creation failed, delete the uploaded avatar to prevent orphaned files
       await deleteFromCloudinary(avatarUrl.public_id);
     }
+    if (error instanceof ApiError) throw error;
     throw new ApiError(500, "User registration failed. Please try again.");
   }
 });
@@ -103,6 +132,10 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid email or password");
+  }
+
+  if (!user.isVerified) {
+    throw new ApiError(403, "Please verify your email before logging in");
   }
 
   //Grab access token and refresh token
@@ -129,6 +162,87 @@ const loginUser = asyncHandler(async (req, res) => {
         "User logged in successfully"
       )
     );
+});
+
+// 2b. Verify Email
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.query;
+  
+  if (!token) {
+    throw new ApiError(400, "Verification token is required");
+  }
+
+  const user = await User.findOne({
+    verificationToken: token,
+    tokenExpiry: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Invalid or expired verification token");
+  }
+
+  user.isVerified = true;
+  user.verificationToken = undefined;
+  user.tokenExpiry = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  return res.status(200).json(new ApiResponse(200, {}, "Email verified successfully"));
+});
+
+// 2c. Forgot Password
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  if (!email) throw new ApiError(400, "Email is required");
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    // Return success anyway to prevent email enumeration
+    return res.status(200).json(new ApiResponse(200, {}, "If an account with that email exists, a reset link has been sent."));
+  }
+
+  const resetToken = generateToken();
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpiry = generateTokenExpiry(15);
+  await user.save({ validateBeforeSave: false });
+
+  try {
+    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+    const emailHtml = `<p>Hi ${user.fullName},</p><p>You requested a password reset. Click the link below to set a new password:</p><a href="${resetLink}">Reset Password</a><p>If you didn't request this, you can safely ignore this email.</p>`;
+    
+    await sendEmail(user.email, "Reset your password", emailHtml);
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiry = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new ApiError(500, "Failed to send password reset email");
+  }
+
+  return res.status(200).json(new ApiResponse(200, {}, "If an account with that email exists, a reset link has been sent."));
+});
+
+// 2d. Reset Password
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, newPassword } = req.body;
+  
+  if (!token || !newPassword) {
+    throw new ApiError(400, "Token and new password are required");
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpiry: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Invalid or expired reset token");
+  }
+
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpiry = undefined;
+  await user.save({ validateBeforeSave: true }); // trigger pre-save hook for password hash
+
+  return res.status(200).json(new ApiResponse(200, {}, "Password has been reset successfully"));
 });
 
 // 3. Logout User
@@ -364,6 +478,9 @@ const searchUsers = asyncHandler(async (req, res) => {
 export {
   registerUser,
   loginUser,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
   logoutUser,
   refreshAccessToken,
   changeCurrentPassword,

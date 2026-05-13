@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 
+
+dotenv.config({ path: "./backend/.env" });
 const app = express();
 
 // this will check the incoming request and log the method and URL before passing control to the next middleware or route handler.
@@ -37,6 +39,7 @@ import { ApiResponse } from "./utils/ApiResponse.js";
 
 // Use routes
 app.use("/api/v1/users", userRouter);
+app.use("/api/auth", userRouter);
 app.use("/api/v1/follow", followRouter);
 app.use("/api/v1/tasks", taskRouter);
 app.use("/api/v1/insights", insightRouter);

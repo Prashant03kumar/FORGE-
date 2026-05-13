@@ -29,7 +29,12 @@ const Login = () => {
         alert("Login successful, but token missing in body. Check console.");
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Login Failed");
+      const errorMessage = err.response?.data?.message || "Login Failed";
+      if (err.response?.status === 403) {
+        alert("Account Not Verified: Please check your email to verify your account before logging in.");
+      } else {
+        alert(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -95,6 +100,12 @@ const Login = () => {
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
+          </div>
+
+          <div className="flex justify-end pr-1">
+            <Link to="/forgot-password" size={18} className="text-[10px] sm:text-xs text-gray-400 hover:text-[#FF6B00] font-bold transition-colors">
+              Forgot Password?
+            </Link>
           </div>
 
           <button

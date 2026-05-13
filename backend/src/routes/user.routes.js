@@ -2,6 +2,9 @@ import { Router } from "express";
 import {
   registerUser,
   loginUser,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
   refreshAccessToken,
   logoutUser,
   getCurrentUser,
@@ -27,6 +30,9 @@ router.route("/register").post(
 );
 
 router.route("/login").post(loginUser);
+router.route("/verify-email").get(verifyEmail);
+router.route("/forgot-password").post(forgotPassword);
+router.route("/reset-password").post(resetPassword);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/search").get(searchUsers);
 router.route("/u/:username").get(getUserProfile);

@@ -8,6 +8,9 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import UserProfile from "./pages/UserProfile";
 import DashboardLayout from "./Layout/DashboardLayout";
+import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import { useAuth } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
@@ -20,6 +23,9 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Protected Dashboard Route Group */}
       <Route
